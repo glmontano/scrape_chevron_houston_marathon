@@ -18,11 +18,17 @@ Google Chrome driver is also required. Download the *driver version* required fo
 
 ## To Do
 
-Update driver functions due to `DeprecationWarning`:
+1st:
 
-```shell
- DeprecationWarning: executable_path has been deprecated, please pass in a Service object
-  driver = webdriver.Chrome(CHROME_DRIVER_PATH, options=chrome_options)
-```
+	Update driver functions due to `DeprecationWarning`:
 
-Explanation here: `https://stackoverflow.com/questions/64717302/deprecationwarning-executable-path-has-been-deprecated-selenium-python`
+	```shell
+	 DeprecationWarning: executable_path has been deprecated, please pass in a Service object
+	  driver = webdriver.Chrome(CHROME_DRIVER_PATH, options=chrome_options)
+	```
+
+	Explanation here: `https://stackoverflow.com/questions/64717302/deprecationwarning-executable-path-has-been-deprecated-selenium-python`
+
+2nd:
+
+	Allow for database saving, specifically `POSTGRES`
