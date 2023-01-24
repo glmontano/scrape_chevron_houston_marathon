@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -17,11 +18,9 @@ CHROME_DRIVER_PATH = r'C:\Users\gloui\Desktop\chromedriver\chromedriver_109.exe'
 
 #################################################################
 
-chrome_options = Options()
-chrome_options.add_experimental_option("detach", True)
-
 URL = f'https://track.rtrt.me/e/HOU-{YEAR}'
 CSV_FILE_NAME = f'houston_marathon_{YEAR}.csv'
+TABLE_HEADERS = ['place', 'name', 'time', 'gender', 'age']
 
 XPATH_ALL_FINISHERS_LIST = '//tr[@data-course="marathon"]'
 XPATH_IFRAME = '//iframe[@name="rtframe"]'
@@ -39,10 +38,11 @@ def scrape_chevron_houston_marathon_data():
 
     chrome_options = webdriver.ChromeOptions()
     chrome_options.headless = False
-    chrome_options.add_experimental_option("detach", True)
+    chrome_options.add_experimental_option("detach", True) # Keep Google Chrome window after ending script
+    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging']) # Remove DevTools and other redundant logs
 
     try:
-        driver = webdriver.Chrome(executable_path=CHROME_DRIVER_PATH, options=chrome_options)
+        driver = webdriver.Chrome(service=Service(CHROME_DRIVER_PATH), options=chrome_options)
         driver.get(URL)
 
         # The trick is that everything is in an iframe! Go into the iframe and continue
@@ -67,7 +67,7 @@ def scrape_chevron_houston_marathon_data():
         # Begin to go through contestants; write data to CSV file
         with open(CSV_FILE_NAME, 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['place', 'name', 'time', 'gender'])
+            writer.writerow(TABLE_HEADERS)
 
             # Loop through all pages!
             while page_end_place <= total_contestants:
@@ -78,7 +78,8 @@ def scrape_chevron_houston_marathon_data():
                 athlete_names = driver.find_elements(By.XPATH, XPATH_ATHLETE_NAME)
                 athlete_places = driver.find_elements(By.XPATH, XPATH_ATHLETE_PLACE)
                 athlete_times = driver.find_elements(By.XPATH, XPATH_ATHLETE_TIME)
-                athlete_genders = driver.find_elements(By.XPATH, XPATH_ATHLETE_GENDER)
+                athlete_genders = driver.find_elements(By.XPATH, XPATH_ATHLETE_GENDER) # Athletes age also covered by this
+                athlete_age = ""
 
                 # Capture the results into a CSV file!
                 if athlete_names:
@@ -103,8 +104,12 @@ def scrape_chevron_houston_marathon_data():
                         except (IndexError, ValueError):
                             athlete_gender = 'N/A'
                         # print('Gender:', athlete_gender)
-                        # print('=============')
-                        writer.writerow([athlete_place, athlete_name, athlete_time, athlete_gender])
+                        try:
+                            athlete_age = int(athlete_genders[j].text.split('\n')[-1].split(' ')[1].split('-')[1])
+                        except (IndexError, ValueError):
+                            athlete_age = 'N/A'
+                        # print('Age:', athelete_age)
+                        writer.writerow([athlete_place, athlete_name, athlete_time, athlete_gender, athlete_age])
 
                 # Go to next page
                 button = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH, XPATH_NEXT_PAGE_BUTTON)))
