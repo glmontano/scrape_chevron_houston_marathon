@@ -2,7 +2,7 @@
 
 Scrapes data from 
 
-'https://track.rtrt.me/e/HOU-{YEAR}'
+`https://track.rtrt.me/e/HOU-{YEAR}`
 
 where `YEAR` is the year of the marathon of interest. Successfully tested for `2022` and `2023`.
 
