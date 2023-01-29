@@ -18,6 +18,4 @@ Google Chrome driver is also required. Download the *driver version* required fo
 
 ## To Do
 
-1st:
-
-Allow for database saving, specifically `POSTGRES`
+- Allow for database saving, specifically `POSTGRES`
